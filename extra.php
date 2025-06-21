@@ -1,0 +1,226 @@
+<?php
+function gcd($a, $b) {
+    while ($b != 0) {
+        $t = $b;
+        $b = $a % $b;
+        $a = $t;
+    }
+    return abs($a);
+}
+
+function isRepeatingDecimal($numerator, $denominator) {
+    $gcd_val = gcd($numerator, $denominator);
+    $simplifiedDenominator = $denominator / $gcd_val;
+
+    while ($simplifiedDenominator % 2 === 0) {
+        $simplifiedDenominator /= 2;
+    }
+    while ($simplifiedDenominator % 5 === 0) {
+        $simplifiedDenominator /= 5;
+    }
+
+    return $simplifiedDenominator !== 1;
+}
+
+$d1 = $_GET["dividend"] ?? 0;
+$d2 = $_GET["divisor"] ?? 1;
+
+$quotient = "";
+$subtractions = [];
+$isRepeating = false;
+
+if ($d2 == 0) {
+    $quotient = "Error";
+    $remainder = "Error";
+} else {
+    $isRepeating = isRepeatingDecimal($d1, $d2);
+
+    $integerPart = intdiv($d1, $d2);
+    $integerMultiplication = $integerPart * $d2;
+    $remainder = $d1 - $integerMultiplication;
+
+    $subtractions[] = [
+        'multiplication' => $integerMultiplication,
+        'remainder' => $remainder
+    ];
+
+    $decimalQuotient = (string)$integerPart;
+
+    if ($remainder != 0) {
+        $decimalQuotient .= ".";
+        $seenRemainders = [];
+        $digits = [];
+        $cycleStartPosition = null;
+        $digitCounter = 0;
+        $maxDigits = 50;
+        $zeroSubtractedAlready = false;
+
+        while ($remainder != 0 && $digitCounter < $maxDigits) {
+            if (isset($seenRemainders[$remainder])) {
+                $cycleStartPosition = $seenRemainders[$remainder];
+                break;
+            }
+
+            $seenRemainders[$remainder] = $digitCounter;
+
+            $remainder *= 10;
+            $digit = intdiv($remainder, $d2);
+            $multiplication = $digit * $d2;
+            $remainder -= $multiplication;
+
+            if ($multiplication > 0 || !$zeroSubtractedAlready) {
+                $subtractions[] = [
+                    'multiplication' => $multiplication,
+                    'remainder' => $remainder
+                ];
+                if ($multiplication == 0) {
+                    $zeroSubtractedAlready = true;
+                }
+            }
+
+            $digits[] = $digit;
+            $digitCounter++;
+        }
+
+        if ($cycleStartPosition === null) {
+            $decimalQuotient .= implode("", $digits);
+        } else {
+            $nonRepeatingPart = array_slice($digits, 0, $cycleStartPosition);
+            $repeatingPart = array_slice($digits, $cycleStartPosition);
+
+            $decimalQuotient .= implode("", $nonRepeatingPart);
+            for ($i = 0; $i < 2; $i++) {
+                foreach ($repeatingPart as $repeatingDigit) {
+                    $remainder *= 10;
+                    $multiplication = $repeatingDigit * $d2;
+                    $remainder -= $multiplication;
+
+                    $subtractions[] = [
+                        'multiplication' => $multiplication,
+                        'remainder' => $remainder
+                    ];
+
+                    $decimalQuotient .= $repeatingDigit;
+                }
+
+                $decimalQuotient .= implode("", $repeatingPart);
+            }
+        }
+    } else {
+        $decimalQuotient = (string)$integerPart;
+    }
+
+    $quotient = $decimalQuotient;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Decimal Division</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="container">
+    <h1>Decimal Division Anatomy</h1>
+    <form method="get" action="<?= $_SERVER["PHP_SELF"] ?>">
+        <label for="dividend" id="dividendLabel">Dividend:</label><br>
+        <input type="number" step="any" id="dividend" name="dividend" value="<?= $d1 ?>" required><br>
+
+        <label for="divisor" id="divisorLabel">Divisor:</label><br>
+        <input type="number" step="any" id="divisor" name="divisor" value="<?= $d2 ?>" required><br>
+
+        <button type="submit">Calculate</button>
+    </form>
+</div>
+
+<div id="structure-container">
+    <h2>Division Steps</h2>
+    <div id="calculation-container">
+        <div id="dividend-container" class="operands-container"><?= $d1 ?></div>
+        <div id="divisor-container" class="operands-container"><?= $d2 ?></div>
+        <div id="remainder-container">
+            <?php
+                $stepNumber = 1;
+                $zeroAlreadyShown = false;
+
+                if (!isset($cycleStartPosition)) {
+                    foreach ($subtractions as $step) {
+                        // empty: display logic is below
+                    }
+                } else {
+                    for ($i = 0; $i <= $cycleStartPosition; $i++) {
+                        if (isset($subtractions[$i])) {
+                            if ($subtractions[$i]['multiplication'] == 0) {
+                                $zeroAlreadyShown = true;
+                            }
+                        }
+                    }
+
+                    $cycleLength = count($subtractions) - $cycleStartPosition - 1;
+                    $repetitions = 3;
+                    for ($r = 0; $r < $repetitions; $r++) {
+                        $zeroAlreadyShown = false;
+                        for ($j = 0; $j < $cycleLength; $j++) {
+                            $i = $cycleStartPosition + 1 + $j;
+                            if (!isset($subtractions[$i])) break;
+                            if ($subtractions[$i]['multiplication'] > 0 || !$zeroAlreadyShown) {
+                                if ($subtractions[$i]['multiplication'] == 0) {
+                                    $zeroAlreadyShown = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $space = 75;
+                $totalSteps = count($subtractions);
+
+                for ($i = 0; $i < $totalSteps; $i++) {
+                    $step = $subtractions[$i];
+                    if (isset($remainderBackup) && strlen((string)$step['multiplication']) < strlen((string)$remainderBackup)) {
+                        $space += 15;
+                    }
+                    $width = strlen((string)$step['multiplication']) * 25;
+                    echo "<p style='width: {$width}px; margin-left: {$space}px; margin-top:-30px; border-bottom: 3px solid black;'>-" . $step['multiplication'] . "</p>";
+
+                    if (isset($remainderBackup) && strlen((string)$step['multiplication']) < strlen((string)$remainderBackup)) {
+                        $space -= 10;
+                    }
+
+                    $digitLength = strlen((string)abs($step['multiplication']));
+                    $space += ($digitLength - 1) * 10;
+                    $space += 10;
+
+                    if ($i === $totalSteps - 1) {
+                        $space += 10;
+                        echo "<p style='margin-left: {$space}px; margin-top:-30px;'>{$step['remainder']}</p>";
+                    } else {
+                        echo "<p style='margin-left: {$space}px; margin-top:-30px;'>" . ($step['remainder'] * 10) . "</p>";
+                    }
+
+                    $space -= 8;
+                    $remainderBackup = $step['remainder'] * 10;
+                }
+            ?>
+        </div>
+        <div id="quotient-container" class="operands-container"><?= $quotient ?></div>
+    </div>
+
+    <?php if ($d2 != 0): ?>
+    <div id="result-type">
+        <?php if ($isRepeating): ?>
+            <p style="color: red; font-weight: bold;">
+                Warning: this division results in a repeating decimal! The cycle was repeated 3 times.
+            </p>
+        <?php else: ?>
+            <p style="color: green; font-weight: bold;">
+                This division has an exact decimal result.
+            </p>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+</div>
+</body>
+</html>
