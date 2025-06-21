@@ -174,7 +174,7 @@ if ($d2 == 0) {
                     }
                 }
 
-                $space = 110;;
+                $space = 117;
                 $totalSteps = count($subtractions);
 
                 for ($i = 0; $i < $totalSteps; $i++) {
