@@ -90,7 +90,7 @@ if ($d2 == 0) {
 
             $decimalQuotient .= implode("", $nonRepeatingPart);
 
-            $repeatingTimes = 3;
+            $repeatingTimes = 2;
             for ($i = 0; $i < $repeatingTimes; $i++) {
                 foreach ($repeatingPart as $repeatingDigit) {
                     $remainder *= 10;
@@ -104,6 +104,9 @@ if ($d2 == 0) {
 
                     $decimalQuotient .= $repeatingDigit;
                 }
+            }
+            foreach($repeatingPart as $repeatingDigit) {
+                $decimalQuotient .= $repeatingDigit;
             }
         }
     } else {
@@ -143,7 +146,7 @@ if ($d2 == 0) {
         <div id="remainder-container">
             <?php
                 $space = 117;
-                $totalSteps = count($subtractions)-1;
+                $totalSteps = count($subtractions);
 
                 for ($i = 0; $i < $totalSteps; $i++) {
                     $step = $subtractions[$i];
