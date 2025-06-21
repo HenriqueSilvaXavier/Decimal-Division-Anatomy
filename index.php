@@ -89,7 +89,9 @@ if ($d2 == 0) {
             $repeatingPart = array_slice($digits, $cycleStartPosition);
 
             $decimalQuotient .= implode("", $nonRepeatingPart);
-            for ($i = 0; $i < 2; $i++) {
+
+            $repeatingTimes = 3;
+            for ($i = 0; $i < $repeatingTimes; $i++) {
                 foreach ($repeatingPart as $repeatingDigit) {
                     $remainder *= 10;
                     $multiplication = $repeatingDigit * $d2;
@@ -102,8 +104,6 @@ if ($d2 == 0) {
 
                     $decimalQuotient .= $repeatingDigit;
                 }
-
-                $decimalQuotient .= implode("", $repeatingPart);
             }
         }
     } else {
@@ -142,46 +142,16 @@ if ($d2 == 0) {
         <div id="divisor-container" class="operands-container"><?= $d2 ?></div>
         <div id="remainder-container">
             <?php
-                $stepNumber = 1;
-                $zeroAlreadyShown = false;
-
-                if (!isset($cycleStartPosition)) {
-                    foreach ($subtractions as $step) {
-                        // empty: display logic is below
-                    }
-                } else {
-                    for ($i = 0; $i <= $cycleStartPosition; $i++) {
-                        if (isset($subtractions[$i])) {
-                            if ($subtractions[$i]['multiplication'] == 0) {
-                                $zeroAlreadyShown = true;
-                            }
-                        }
-                    }
-
-                    $cycleLength = count($subtractions) - $cycleStartPosition - 1;
-                    $repetitions = 3;
-                    for ($r = 0; $r < $repetitions; $r++) {
-                        $zeroAlreadyShown = false;
-                        for ($j = 0; $j < $cycleLength; $j++) {
-                            $i = $cycleStartPosition + 1 + $j;
-                            if (!isset($subtractions[$i])) break;
-                            if ($subtractions[$i]['multiplication'] > 0 || !$zeroAlreadyShown) {
-                                if ($subtractions[$i]['multiplication'] == 0) {
-                                    $zeroAlreadyShown = true;
-                                }
-                            }
-                        }
-                    }
-                }
-
                 $space = 117;
-                $totalSteps = count($subtractions);
+                $totalSteps = count($subtractions)-1;
 
                 for ($i = 0; $i < $totalSteps; $i++) {
                     $step = $subtractions[$i];
+
                     if (isset($remainderBackup) && strlen((string)$step['multiplication']) < strlen((string)$remainderBackup)) {
                         $space += 15;
                     }
+
                     $width = strlen((string)$step['multiplication']) * 25;
                     echo "<p style='width: {$width}px; margin-left: {$space}px; margin-top:-30px; border-bottom: 3px solid black;'>-" . $step['multiplication'] . "</p>";
 
@@ -205,6 +175,7 @@ if ($d2 == 0) {
                 }
             ?>
         </div>
+
         <div id="quotient-container" class="operands-container"><?= $quotient ?></div>
     </div>
 
