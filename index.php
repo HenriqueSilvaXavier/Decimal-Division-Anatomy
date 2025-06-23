@@ -1,4 +1,5 @@
 <?php
+setlocale(LC_ALL, 'en_US.UTF-8');
 function gcd($a, $b) {
     while ($b != 0) {
         $t = $b;
@@ -24,7 +25,6 @@ function isRepeatingDecimal($numerator, $denominator) {
 
 $d1 = $_GET["dividend"] ?? 0;
 $d2 = $_GET["divisor"] ?? 1;
-
 $quotient = "";
 $subtractions = [];
 $isRepeating = false;
@@ -33,6 +33,15 @@ if ($d2 == 0) {
     $quotient = "Error";
     $remainder = "Error";
 } else {
+    $wasScaled = false;
+    $scaleCount = 0;
+    while (fmod($d1, 1) != 0 || fmod($d2, 1) != 0) {
+        $d1 *= 10;
+        $d2 *= 10;
+        $wasScaled = true;
+        $scaleCount++;
+    }
+
     $isRepeating = isRepeatingDecimal($d1, $d2);
 
     $integerPart = intdiv($d1, $d2);
@@ -129,13 +138,20 @@ if ($d2 == 0) {
     <h1>Decimal Division Anatomy</h1>
     <form method="get" action="<?= $_SERVER["PHP_SELF"] ?>">
         <label for="dividend" id="dividendLabel">Dividend:</label><br>
-        <input type="number" step="any" id="dividend" name="dividend" value="<?= $d1 ?>" required><br>
+        <input type="number" step="any" id="dividend" name="dividend" value="<?= $d1?>" required><br>
 
         <label for="divisor" id="divisorLabel">Divisor:</label><br>
         <input type="number" step="any" id="divisor" name="divisor" value="<?= $d2 ?>" required><br>
 
         <button type="submit">Calculate</button>
     </form>
+    <?php if ($wasScaled): ?>
+        <p style="color: orange; font-weight: bold; margin-top: 10px;">
+            Note: The dividend and divisor were multiplied by 10 (<?= $scaleCount ?> time<?= $scaleCount > 1 ? "s" : "" ?>) 
+        to eliminate decimal points and allow manual division with whole numbers.
+        </p>
+    <?php endif; ?>
+
 </div>
 
 <div id="structure-container">
@@ -152,7 +168,7 @@ if ($d2 == 0) {
             <div></div>
             <div id="remainder-container">
                 <?php
-                    $space = 0;
+                    $space = -10;
                     $totalSteps = count($subtractions);
 
                     for ($i = 0; $i < $totalSteps; $i++) {
@@ -165,16 +181,12 @@ if ($d2 == 0) {
                         $width = strlen((string)$step['multiplication']) * 25;
                         echo "<p style='width: {$width}px; margin-left: {$space}px; margin-top:-30px; border-bottom: 3px solid black;'>-" . $step['multiplication'] . "</p>";
 
-                        if (isset($remainderBackup) && strlen((string)$step['multiplication']) < strlen((string)$remainderBackup)) {
-                            $space -= 10;
-                        }
-
                         $digitLength = strlen((string)abs($step['multiplication']));
-                        $space += ($digitLength - 1) * 10;
-                        $space += 10;
-
+                        if($step['multiplication']>0){
+                            $space += ($digitLength-strlen((string)$step['remainder'])) * 14.8;
+                        }
+                        $space+=10.14;
                         if ($i === $totalSteps - 1) {
-                            $space += 6;
                             echo "<p style='margin-left: {$space}px; margin-top:-30px;'>{$step['remainder']}</p>";
                         } else {
                             echo "<p style='margin-left: {$space}px; margin-top:-30px;'>" . ($step['remainder'] * 10) . "</p>";
