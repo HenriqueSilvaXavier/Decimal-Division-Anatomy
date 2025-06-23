@@ -8,7 +8,7 @@ body {
 
 #container, #structure-container {
     background-color: white;
-    width: 570px;
+    width: 98%;
     margin: 20px auto;
     padding: 15px;
     border-radius: 3%;
@@ -19,7 +19,7 @@ body {
 form {
     background-color: #E6E1EF;
     padding: 15px;
-    width: 89%;
+    width: 97%;
     border-radius: 3%;
 }
 
@@ -57,10 +57,10 @@ h2 {
 }
 
 .operands-container {
-    padding: 30px;
+    padding: 25px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    font-size: 40px;
+    font-size: 30px;
 }
 #dividend-grid {
     display: grid;
@@ -87,7 +87,7 @@ h2 {
 
 #remainder-grid {
     font-size: 30px;
-    margin-top: -100px;
+    margin-top: -80px;
     display: grid;
     grid-template-columns: 33.3% 66.6%;
     align-items: start;
