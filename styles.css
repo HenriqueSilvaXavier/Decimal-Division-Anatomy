@@ -58,16 +58,22 @@ h2 {
 
 .operands-container {
     padding: 30px;
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     font-size: 40px;
 }
+#dividend-grid {
+    display: grid;
+    grid-template-columns: 33.3% 66.6%;
+    align-items: start;
+    column-gap: 0px;
+    height: 20px;
+}
 
-#divisor-container {
+#divisor-grid{
     border-left: 3px solid black;
     border-bottom: 3px solid black;
 }
-
 #result-type {
     background-color: #f2f2f2;
     padding: 10px;
@@ -79,8 +85,13 @@ h2 {
     overflow-y: auto;
 }
 
-#remainder-container {
+#remainder-grid {
     font-size: 30px;
+    margin-top: -100px;
+    display: grid;
+    grid-template-columns: 33.3% 66.6%;
+    align-items: start;
+    column-gap: 0px;
 }
 .btn-export {
     margin: 20px auto;
