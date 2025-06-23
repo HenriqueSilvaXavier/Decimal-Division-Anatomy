@@ -141,44 +141,51 @@ if ($d2 == 0) {
 <div id="structure-container">
     <h2>Division Steps</h2>
     <div id="calculation-container">
-        <div id="dividend-container" class="operands-container"><?= $d1 ?></div>
-        <div id="divisor-container" class="operands-container"><?= $d2 ?></div>
-        <div id="remainder-container">
-            <?php
-                $space = 117;
-                $totalSteps = count($subtractions);
-
-                for ($i = 0; $i < $totalSteps; $i++) {
-                    $step = $subtractions[$i];
-
-                    if (isset($remainderBackup) && strlen((string)$step['multiplication']) < strlen((string)$remainderBackup)) {
-                        $space += 15;
-                    }
-
-                    $width = strlen((string)$step['multiplication']) * 25;
-                    echo "<p style='width: {$width}px; margin-left: {$space}px; margin-top:-30px; border-bottom: 3px solid black;'>-" . $step['multiplication'] . "</p>";
-
-                    if (isset($remainderBackup) && strlen((string)$step['multiplication']) < strlen((string)$remainderBackup)) {
-                        $space -= 10;
-                    }
-
-                    $digitLength = strlen((string)abs($step['multiplication']));
-                    $space += ($digitLength - 1) * 10;
-                    $space += 10;
-
-                    if ($i === $totalSteps - 1) {
-                        $space += 6;
-                        echo "<p style='margin-left: {$space}px; margin-top:-30px;'>{$step['remainder']}</p>";
-                    } else {
-                        echo "<p style='margin-left: {$space}px; margin-top:-30px;'>" . ($step['remainder'] * 10) . "</p>";
-                    }
-
-                    $space -= 8;
-                    $remainderBackup = $step['remainder'] * 10;
-                }
-            ?>
+        <div id="dividend-grid" class="operands-container">
+            <div></div>
+            <div id="dividend-container"><?= $d1 ?></div>
         </div>
+        <div id="divisor-grid" class="operands-container">
+            <div id="divisor-container" class="operands-container"><?= $d2 ?></div>
+        </div>
+        <div id="remainder-grid" class="operands-container">
+            <div></div>
+            <div id="remainder-container">
+                <?php
+                    $space = 0;
+                    $totalSteps = count($subtractions);
 
+                    for ($i = 0; $i < $totalSteps; $i++) {
+                        $step = $subtractions[$i];
+
+                        if (isset($remainderBackup) && strlen((string)$step['multiplication']) < strlen((string)$remainderBackup)) {
+                            $space += 15;
+                        }
+
+                        $width = strlen((string)$step['multiplication']) * 25;
+                        echo "<p style='width: {$width}px; margin-left: {$space}px; margin-top:-30px; border-bottom: 3px solid black;'>-" . $step['multiplication'] . "</p>";
+
+                        if (isset($remainderBackup) && strlen((string)$step['multiplication']) < strlen((string)$remainderBackup)) {
+                            $space -= 10;
+                        }
+
+                        $digitLength = strlen((string)abs($step['multiplication']));
+                        $space += ($digitLength - 1) * 10;
+                        $space += 10;
+
+                        if ($i === $totalSteps - 1) {
+                            $space += 6;
+                            echo "<p style='margin-left: {$space}px; margin-top:-30px;'>{$step['remainder']}</p>";
+                        } else {
+                            echo "<p style='margin-left: {$space}px; margin-top:-30px;'>" . ($step['remainder'] * 10) . "</p>";
+                        }
+
+                        $space -= 8;
+                        $remainderBackup = $step['remainder'] * 10;
+                    }
+                ?>
+            </div>
+        </div>
         <div id="quotient-container" class="operands-container"><?= $quotient ?></div>
     </div>
 
@@ -197,6 +204,8 @@ if ($d2 == 0) {
     <?php endif; ?>
 </div>
 <button class="btn-export" onclick="exportImage()">📷 Export as Image</button>
+
+<!-- Script html2canvas (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
 function exportImage() {
