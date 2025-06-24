@@ -82,9 +82,6 @@ if ($d2 == 0) {
                     'multiplication' => $multiplication,
                     'remainder' => $remainder
                 ];
-                if ($multiplication == 0) {
-                    $zeroSubtractedAlready = true;
-                }
             }
 
             $digits[] = $digit;
@@ -183,7 +180,7 @@ if ($d2 == 0) {
 
                         $digitLength = strlen((string)abs($step['multiplication']));
                         if($step['multiplication']>0){
-                            $space += ($digitLength-strlen((string)$step['remainder'])) * 14.8;
+                            $space += ($digitLength-strlen((string)$step['remainder'])) * 14.4;
                         }
                         $space+=10.14;
                         if ($i === $totalSteps - 1) {
